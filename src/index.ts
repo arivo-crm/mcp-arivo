@@ -16,6 +16,7 @@ import { TaskTypesHandler, taskTypesToolDefinitions } from './handlers/task-type
 import { UsersHandler, usersToolDefinitions } from './handlers/users.js';
 import { TeamsHandler, teamsToolDefinitions } from './handlers/teams.js';
 import { PipelinesHandler, pipelinesToolDefinitions } from './handlers/pipelines.js';
+import { CustomFieldsHandler, customFieldsToolDefinitions } from './handlers/custom-fields.js';
 import { Command } from 'commander';
 
 const program = new Command();
@@ -49,6 +50,7 @@ class ArivoMCPServer {
   private usersHandler: UsersHandler;
   private teamsHandler: TeamsHandler;
   private pipelinesHandler: PipelinesHandler;
+  private customFieldsHandler: CustomFieldsHandler;
 
   constructor() {
     this.server = new Server(
@@ -74,6 +76,7 @@ class ArivoMCPServer {
       this.usersHandler = new UsersHandler(this.apiClient);
       this.teamsHandler = new TeamsHandler(this.apiClient);
       this.pipelinesHandler = new PipelinesHandler(this.apiClient);
+      this.customFieldsHandler = new CustomFieldsHandler(this.apiClient);
     } catch (error: any) {
       console.error('Configuration error:', error.message);
       process.exit(1);
@@ -94,6 +97,7 @@ class ArivoMCPServer {
           ...usersToolDefinitions,
           ...teamsToolDefinitions,
           ...pipelinesToolDefinitions,
+          ...customFieldsToolDefinitions,
         ],
       };
     });
@@ -200,6 +204,11 @@ class ArivoMCPServer {
             break;
           case 'get_pipeline':
             result = await this.pipelinesHandler.getPipeline(args as { id: number });
+            break;
+
+          // Custom Fields handlers
+          case 'get_custom_fields':
+            result = await this.customFieldsHandler.getCustomFields(args as { id: string });
             break;
 
           default:
