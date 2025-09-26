@@ -12,6 +12,10 @@ import { ContactsHandler, contactsToolDefinitions } from './handlers/contacts.js
 import { DealsHandler, dealsToolDefinitions } from './handlers/deals.js';
 import { TasksHandler, tasksToolDefinitions } from './handlers/tasks.js';
 import { NotesHandler, notesToolDefinitions } from './handlers/notes.js';
+import { TaskTypesHandler, taskTypesToolDefinitions } from './handlers/task-types.js';
+import { UsersHandler, usersToolDefinitions } from './handlers/users.js';
+import { TeamsHandler, teamsToolDefinitions } from './handlers/teams.js';
+import { PipelinesHandler, pipelinesToolDefinitions } from './handlers/pipelines.js';
 import { Command } from 'commander';
 
 const program = new Command();
@@ -41,6 +45,10 @@ class ArivoMCPServer {
   private dealsHandler: DealsHandler;
   private tasksHandler: TasksHandler;
   private notesHandler: NotesHandler;
+  private taskTypesHandler: TaskTypesHandler;
+  private usersHandler: UsersHandler;
+  private teamsHandler: TeamsHandler;
+  private pipelinesHandler: PipelinesHandler;
 
   constructor() {
     this.server = new Server(
@@ -62,6 +70,10 @@ class ArivoMCPServer {
       this.dealsHandler = new DealsHandler(this.apiClient);
       this.tasksHandler = new TasksHandler(this.apiClient);
       this.notesHandler = new NotesHandler(this.apiClient);
+      this.taskTypesHandler = new TaskTypesHandler(this.apiClient);
+      this.usersHandler = new UsersHandler(this.apiClient);
+      this.teamsHandler = new TeamsHandler(this.apiClient);
+      this.pipelinesHandler = new PipelinesHandler(this.apiClient);
     } catch (error: any) {
       console.error('Configuration error:', error.message);
       process.exit(1);
@@ -78,6 +90,10 @@ class ArivoMCPServer {
           ...dealsToolDefinitions,
           ...tasksToolDefinitions,
           ...notesToolDefinitions,
+          ...taskTypesToolDefinitions,
+          ...usersToolDefinitions,
+          ...teamsToolDefinitions,
+          ...pipelinesToolDefinitions,
         ],
       };
     });
@@ -155,6 +171,35 @@ class ArivoMCPServer {
             break;
           case 'delete_note':
             result = await this.notesHandler.deleteNote(args as { id: number });
+            break;
+
+          // Task Types handlers
+          case 'list_task_types':
+            result = await this.taskTypesHandler.listTaskTypes();
+            break;
+
+          // Users handlers
+          case 'list_users':
+            result = await this.usersHandler.listUsers(args);
+            break;
+          case 'get_user':
+            result = await this.usersHandler.getUser(args as { id: number });
+            break;
+
+          // Teams handlers
+          case 'list_teams':
+            result = await this.teamsHandler.listTeams(args);
+            break;
+          case 'get_team':
+            result = await this.teamsHandler.getTeam(args as { id: number });
+            break;
+
+          // Pipelines handlers
+          case 'list_pipelines':
+            result = await this.pipelinesHandler.listPipelines(args);
+            break;
+          case 'get_pipeline':
+            result = await this.pipelinesHandler.getPipeline(args as { id: number });
             break;
 
           default:

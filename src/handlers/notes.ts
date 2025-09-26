@@ -109,7 +109,9 @@ export const notesToolDefinitions = [
           properties: {
             text: { type: 'string', description: 'Note content' },
             contact_id: { type: 'number', description: 'Associated contact ID' },
-            deal_id: { type: 'number', description: 'Associated deal ID' }
+            deal_id: { type: 'number', description: 'Associated deal ID' },
+            user_id: { type: 'number', description: 'Assigned user ID' },
+            team_id: { type: 'number', description: 'Assigned team ID' }
           },
           required: ['text']
         }
@@ -129,7 +131,9 @@ export const notesToolDefinitions = [
           properties: {
             text: { type: 'string', description: 'Note content' },
             contact_id: { type: 'number', description: 'Associated contact ID' },
-            deal_id: { type: 'number', description: 'Associated deal ID' }
+            deal_id: { type: 'number', description: 'Associated deal ID' },
+            user_id: { type: 'number', description: 'Assigned user ID' },
+            team_id: { type: 'number', description: 'Assigned team ID' }
           }
         }
       },

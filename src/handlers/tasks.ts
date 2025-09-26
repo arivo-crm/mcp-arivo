@@ -175,7 +175,9 @@ export const tasksToolDefinitions = [
               type: 'array',
               description: 'Array of tags',
               items: { type: 'string' }
-            }
+            },
+            user_id: { type: 'number', description: 'Assigned user ID' },
+            team_id: { type: 'number', description: 'Assigned team ID' }
           },
           required: ['name']
         }
@@ -224,7 +226,9 @@ export const tasksToolDefinitions = [
               type: 'array',
               description: 'Array of tags',
               items: { type: 'string' }
-            }
+            },
+            user_id: { type: 'number', description: 'Assigned user ID' },
+            team_id: { type: 'number', description: 'Assigned team ID' }
           }
         }
       },

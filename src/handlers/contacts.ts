@@ -232,7 +232,9 @@ export const contactsToolDefinitions = [
             custom_fields: {
               type: 'object',
               description: 'Custom fields as key-value pairs'
-            }
+            },
+            user_id: { type: 'number', description: 'Assigned user ID' },
+            team_id: { type: 'number', description: 'Assigned team ID' }
           },
           required: ['name']
         }
@@ -311,7 +313,9 @@ export const contactsToolDefinitions = [
             custom_fields: {
               type: 'object',
               description: 'Custom fields as key-value pairs'
-            }
+            },
+            user_id: { type: 'number', description: 'Assigned user ID' },
+            team_id: { type: 'number', description: 'Assigned team ID' }
           }
         }
       },
