@@ -1,12 +1,41 @@
 import { ArivoApiClient } from '../utils/http';
 
+export interface QuoteItem {
+  id?: number;
+  object?: string;
+  created_at?: string;
+  updated_at?: string;
+  name: string;
+  deal_id?: number;
+  product_id?: number;
+  price: number;
+  quantity: number;
+  discount?: number;
+  total_price?: number;
+}
+
 export interface Deal {
   id?: number;
-  title: string;
+  object?: string;
+  created_at?: string;
+  updated_at?: string;
+  name: string;
+  description?: string;
   value?: number;
-  stage?: string;
+  company_id?: number;
   contact_id?: number;
-  expected_close_date?: string;
+  status?: string;
+  temperature?: string;
+  opened_at?: string;
+  estimated_close_date?: string;
+  closed_at?: string;
+  pipeline_id?: number;
+  pipeline_step_id?: number;
+  quote_items?: QuoteItem[];
+  tags?: string[];
+  custom_fields?: Record<string, any>;
+  team_id?: number;
+  user_id?: number;
   [key: string]: any;
 }
 
@@ -16,10 +45,22 @@ export class DealsHandler {
   async listDeals(args: any = {}): Promise<Deal[]> {
     const params: Record<string, any> = {};
 
-    if (args.limit) params.limit = args.limit;
+    if (args.limit) params.per_page = args.limit;
     if (args.offset) params.offset = args.offset;
-    if (args.stage) params.stage = args.stage;
+    if (args.sort_field) params.sort_field = args.sort_field;
+    if (args.sort_order) params.sort_order = args.sort_order;
+    if (args.status) params.status = args.status;
+    if (args.temperature) params.temperature = args.temperature;
+    if (args.pipeline_id) params.pipeline_id = args.pipeline_id;
+    if (args.pipeline_step_id) params.pipeline_step_id = args.pipeline_step_id;
+    if (args.name) params.name = args.name;
+    if (args.company_id) params.company_id = args.company_id;
+    if (args.contact_id) params.contact_id = args.contact_id;
+    if (args.tags) params.tags = args.tags;
+    if (args.user_id) params.user_id = args.user_id;
+    if (args.team_id) params.team_id = args.team_id;
     if (args.search) params.search = args.search;
+    if (args.stage) params.stage = args.stage; // Keep for backward compatibility
 
     return await this.apiClient.get<Deal[]>('/deals', params);
   }
@@ -32,8 +73,8 @@ export class DealsHandler {
   }
 
   async createDeal(args: { deal: Partial<Deal> }): Promise<Deal> {
-    if (!args.deal || !args.deal.title) {
-      throw new Error('Deal title is required');
+    if (!args.deal || !args.deal.name) {
+      throw new Error('Deal name is required');
     }
     return await this.apiClient.post<Deal>('/deals', args.deal);
   }
@@ -66,7 +107,19 @@ export const dealsToolDefinitions = [
       properties: {
         limit: { type: 'number', description: 'Maximum number of deals to return' },
         offset: { type: 'number', description: 'Number of deals to skip' },
-        stage: { type: 'string', description: 'Filter by deal stage' },
+        sort_field: { type: 'string', description: 'Field to sort by (created_at, updated_at, name, value, temperature, opened_at, estimated_close_date, closed_at)' },
+        sort_order: { type: 'string', description: 'Sort order (asc, desc)' },
+        status: { type: 'string', description: 'Filter by deal status (open, won, lost)' },
+        temperature: { type: 'string', description: 'Filter by deal temperature (cold, warm, hot)' },
+        pipeline_id: { type: 'number', description: 'Filter by pipeline ID' },
+        pipeline_step_id: { type: 'number', description: 'Filter by pipeline step ID' },
+        name: { type: 'string', description: 'Filter by deal name' },
+        company_id: { type: 'number', description: 'Filter by company ID' },
+        contact_id: { type: 'number', description: 'Filter by contact ID' },
+        tags: { type: 'string', description: 'Filter by tags (comma-separated)' },
+        user_id: { type: 'number', description: 'Filter by user ID' },
+        team_id: { type: 'number', description: 'Filter by team ID' },
+        stage: { type: 'string', description: 'Filter by deal stage (deprecated, use status)' },
         search: { type: 'string', description: 'Search term to filter deals' }
       }
     }
@@ -91,13 +144,42 @@ export const dealsToolDefinitions = [
         deal: {
           type: 'object',
           properties: {
-            title: { type: 'string', description: 'Deal title' },
+            name: { type: 'string', description: 'Deal name' },
+            description: { type: 'string', description: 'Deal description' },
             value: { type: 'number', description: 'Deal value' },
-            stage: { type: 'string', description: 'Deal stage' },
+            company_id: { type: 'number', description: 'Associated company ID' },
             contact_id: { type: 'number', description: 'Associated contact ID' },
-            expected_close_date: { type: 'string', description: 'Expected close date (YYYY-MM-DD)' }
+            status: { type: 'string', description: 'Deal status (open, won, lost)' },
+            temperature: { type: 'string', description: 'Deal temperature (cold, warm, hot)' },
+            estimated_close_date: { type: 'string', description: 'Expected close date (YYYY-MM-DD)' },
+            pipeline_id: { type: 'number', description: 'Pipeline ID' },
+            pipeline_step_id: { type: 'number', description: 'Pipeline step ID' },
+            quote_items: {
+              type: 'array',
+              description: 'Array of quote items',
+              items: {
+                type: 'object',
+                properties: {
+                  name: { type: 'string', description: 'Item name' },
+                  product_id: { type: 'number', description: 'Product ID' },
+                  price: { type: 'number', description: 'Item price' },
+                  quantity: { type: 'number', description: 'Item quantity' },
+                  discount: { type: 'number', description: 'Discount percentage' }
+                },
+                required: ['name', 'price', 'quantity']
+              }
+            },
+            tags: {
+              type: 'array',
+              description: 'Array of tags',
+              items: { type: 'string' }
+            },
+            custom_fields: {
+              type: 'object',
+              description: 'Custom fields as key-value pairs'
+            }
           },
-          required: ['title']
+          required: ['name']
         }
       },
       required: ['deal']
@@ -113,11 +195,41 @@ export const dealsToolDefinitions = [
         deal: {
           type: 'object',
           properties: {
-            title: { type: 'string', description: 'Deal title' },
+            name: { type: 'string', description: 'Deal name' },
+            description: { type: 'string', description: 'Deal description' },
             value: { type: 'number', description: 'Deal value' },
-            stage: { type: 'string', description: 'Deal stage' },
+            company_id: { type: 'number', description: 'Associated company ID' },
             contact_id: { type: 'number', description: 'Associated contact ID' },
-            expected_close_date: { type: 'string', description: 'Expected close date (YYYY-MM-DD)' }
+            status: { type: 'string', description: 'Deal status (open, won, lost)' },
+            temperature: { type: 'string', description: 'Deal temperature (cold, warm, hot)' },
+            estimated_close_date: { type: 'string', description: 'Expected close date (YYYY-MM-DD)' },
+            pipeline_id: { type: 'number', description: 'Pipeline ID' },
+            pipeline_step_id: { type: 'number', description: 'Pipeline step ID' },
+            quote_items: {
+              type: 'array',
+              description: 'Array of quote items',
+              items: {
+                type: 'object',
+                properties: {
+                  id: { type: 'number', description: 'Item ID (for updates)' },
+                  name: { type: 'string', description: 'Item name' },
+                  product_id: { type: 'number', description: 'Product ID' },
+                  price: { type: 'number', description: 'Item price' },
+                  quantity: { type: 'number', description: 'Item quantity' },
+                  discount: { type: 'number', description: 'Discount percentage' }
+                },
+                required: ['name', 'price', 'quantity']
+              }
+            },
+            tags: {
+              type: 'array',
+              description: 'Array of tags',
+              items: { type: 'string' }
+            },
+            custom_fields: {
+              type: 'object',
+              description: 'Custom fields as key-value pairs'
+            }
           }
         }
       },
