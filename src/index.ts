@@ -17,6 +17,9 @@ import { UsersHandler, usersToolDefinitions } from './handlers/users.js';
 import { TeamsHandler, teamsToolDefinitions } from './handlers/teams.js';
 import { PipelinesHandler, pipelinesToolDefinitions } from './handlers/pipelines.js';
 import { CustomFieldsHandler, customFieldsToolDefinitions } from './handlers/custom-fields.js';
+import { AttachmentFilesHandler, attachmentFilesToolDefinitions } from './handlers/attachment-files.js';
+import { ProductCategoriesHandler, productCategoriesToolDefinitions } from './handlers/product-categories.js';
+import { ProductsHandler, productsToolDefinitions } from './handlers/products.js';
 import { Command } from 'commander';
 
 const program = new Command();
@@ -51,6 +54,9 @@ class ArivoMCPServer {
   private teamsHandler: TeamsHandler;
   private pipelinesHandler: PipelinesHandler;
   private customFieldsHandler: CustomFieldsHandler;
+  private attachmentFilesHandler: AttachmentFilesHandler;
+  private productCategoriesHandler: ProductCategoriesHandler;
+  private productsHandler: ProductsHandler;
 
   constructor() {
     this.server = new Server(
@@ -77,6 +83,9 @@ class ArivoMCPServer {
       this.teamsHandler = new TeamsHandler(this.apiClient);
       this.pipelinesHandler = new PipelinesHandler(this.apiClient);
       this.customFieldsHandler = new CustomFieldsHandler(this.apiClient);
+      this.attachmentFilesHandler = new AttachmentFilesHandler(this.apiClient);
+      this.productCategoriesHandler = new ProductCategoriesHandler(this.apiClient);
+      this.productsHandler = new ProductsHandler(this.apiClient);
     } catch (error: any) {
       console.error('Configuration error:', error.message);
       process.exit(1);
@@ -98,6 +107,9 @@ class ArivoMCPServer {
           ...teamsToolDefinitions,
           ...pipelinesToolDefinitions,
           ...customFieldsToolDefinitions,
+          ...attachmentFilesToolDefinitions,
+          ...productCategoriesToolDefinitions,
+          ...productsToolDefinitions,
         ],
       };
     });
@@ -209,6 +221,51 @@ class ArivoMCPServer {
           // Custom Fields handlers
           case 'get_custom_fields':
             result = await this.customFieldsHandler.getCustomFields(args as { id: string });
+            break;
+
+          // Attachment Files handlers
+          case 'list_attachment_files':
+            result = await this.attachmentFilesHandler.listAttachmentFiles(args);
+            break;
+          case 'get_attachment_file':
+            result = await this.attachmentFilesHandler.getAttachmentFile((args as { id: number }).id);
+            break;
+          case 'delete_attachment_file':
+            result = await this.attachmentFilesHandler.deleteAttachmentFile((args as { id: number }).id);
+            break;
+
+          // Product Categories handlers
+          case 'list_product_categories':
+            result = await this.productCategoriesHandler.listProductCategories(args);
+            break;
+          case 'get_product_category':
+            result = await this.productCategoriesHandler.getProductCategory((args as { id: number }).id);
+            break;
+          case 'create_product_category':
+            result = await this.productCategoriesHandler.createProductCategory(args as any);
+            break;
+          case 'update_product_category':
+            result = await this.productCategoriesHandler.updateProductCategory(args as any);
+            break;
+          case 'delete_product_category':
+            result = await this.productCategoriesHandler.deleteProductCategory((args as { id: number }).id);
+            break;
+
+          // Products handlers
+          case 'list_products':
+            result = await this.productsHandler.listProducts(args);
+            break;
+          case 'get_product':
+            result = await this.productsHandler.getProduct((args as { id: number }).id);
+            break;
+          case 'create_product':
+            result = await this.productsHandler.createProduct(args as any);
+            break;
+          case 'update_product':
+            result = await this.productsHandler.updateProduct(args as any);
+            break;
+          case 'delete_product':
+            result = await this.productsHandler.deleteProduct((args as { id: number }).id);
             break;
 
           default:
