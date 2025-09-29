@@ -20,6 +20,8 @@ import { CustomFieldsHandler, customFieldsToolDefinitions } from './handlers/cus
 import { AttachmentFilesHandler, attachmentFilesToolDefinitions } from './handlers/attachment-files.js';
 import { ProductCategoriesHandler, productCategoriesToolDefinitions } from './handlers/product-categories.js';
 import { ProductsHandler, productsToolDefinitions } from './handlers/products.js';
+import { CustomRecordDefinitionsHandler, customRecordDefinitionsToolDefinitions } from './handlers/custom-record-definitions.js';
+import { CustomRecordsHandler, customRecordsToolDefinitions } from './handlers/custom-records.js';
 import { Command } from 'commander';
 
 const program = new Command();
@@ -57,6 +59,8 @@ class ArivoMCPServer {
   private attachmentFilesHandler: AttachmentFilesHandler;
   private productCategoriesHandler: ProductCategoriesHandler;
   private productsHandler: ProductsHandler;
+  private customRecordDefinitionsHandler: CustomRecordDefinitionsHandler;
+  private customRecordsHandler: CustomRecordsHandler;
 
   constructor() {
     this.server = new Server(
@@ -86,6 +90,8 @@ class ArivoMCPServer {
       this.attachmentFilesHandler = new AttachmentFilesHandler(this.apiClient);
       this.productCategoriesHandler = new ProductCategoriesHandler(this.apiClient);
       this.productsHandler = new ProductsHandler(this.apiClient);
+      this.customRecordDefinitionsHandler = new CustomRecordDefinitionsHandler(this.apiClient);
+      this.customRecordsHandler = new CustomRecordsHandler(this.apiClient);
     } catch (error: any) {
       console.error('Configuration error:', error.message);
       process.exit(1);
@@ -110,6 +116,8 @@ class ArivoMCPServer {
           ...attachmentFilesToolDefinitions,
           ...productCategoriesToolDefinitions,
           ...productsToolDefinitions,
+          ...customRecordDefinitionsToolDefinitions,
+          ...customRecordsToolDefinitions,
         ],
       };
     });
@@ -266,6 +274,40 @@ class ArivoMCPServer {
             break;
           case 'delete_product':
             result = await this.productsHandler.deleteProduct((args as { id: number }).id);
+            break;
+
+          // Custom Record Definitions handlers
+          case 'list_custom_record_definitions':
+            result = await this.customRecordDefinitionsHandler.listCustomRecordDefinitions(args as any);
+            break;
+          case 'get_custom_record_definition':
+            result = await this.customRecordDefinitionsHandler.getCustomRecordDefinition((args as { id: number }).id);
+            break;
+          case 'create_custom_record_definition':
+            result = await this.customRecordDefinitionsHandler.createCustomRecordDefinition(args as any);
+            break;
+          case 'update_custom_record_definition':
+            result = await this.customRecordDefinitionsHandler.updateCustomRecordDefinition(args as any);
+            break;
+          case 'delete_custom_record_definition':
+            result = await this.customRecordDefinitionsHandler.deleteCustomRecordDefinition((args as { id: number }).id);
+            break;
+
+          // Custom Records handlers
+          case 'list_custom_records':
+            result = await this.customRecordsHandler.listCustomRecords(args as any);
+            break;
+          case 'get_custom_record':
+            result = await this.customRecordsHandler.getCustomRecord(args as any);
+            break;
+          case 'create_custom_record':
+            result = await this.customRecordsHandler.createCustomRecord(args as any);
+            break;
+          case 'update_custom_record':
+            result = await this.customRecordsHandler.updateCustomRecord(args as any);
+            break;
+          case 'delete_custom_record':
+            result = await this.customRecordsHandler.deleteCustomRecord(args as any);
             break;
 
           default:
