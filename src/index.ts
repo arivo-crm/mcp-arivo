@@ -23,13 +23,21 @@ import { ProductsHandler, productsToolDefinitions } from './handlers/products.js
 import { CustomRecordDefinitionsHandler, customRecordDefinitionsToolDefinitions } from './handlers/custom-record-definitions.js';
 import { CustomRecordsHandler, customRecordsToolDefinitions } from './handlers/custom-records.js';
 import { Command } from 'commander';
+import { readFileSync } from 'fs';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const packageJson = JSON.parse(readFileSync(join(__dirname, '../package.json'), 'utf-8'));
+const VERSION = packageJson.version;
 
 const program = new Command();
 
 program
   .name('mcp-arivo')
   .description('MCP server for Arivo CRM integration')
-  .version('1.0.0')
+  .version(VERSION)
   .option('--api-key <key>', 'Arivo API key (overrides ARIVO_API_KEY env var)')
   .option('--api-url <url>', 'Arivo API URL (overrides ARIVO_API_URL env var)')
   .parse();
@@ -66,7 +74,7 @@ class ArivoMCPServer {
     this.server = new Server(
       {
         name: 'arivo-crm-server',
-        version: '1.0.0',
+        version: VERSION,
       },
       {
         capabilities: {
