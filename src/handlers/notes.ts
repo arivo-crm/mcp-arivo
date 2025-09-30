@@ -2,9 +2,13 @@ import { ArivoApiClient } from '../utils/http';
 
 export interface Note {
   id?: number;
-  content: string;
+  text: string;
   contact_id?: number;
   deal_id?: number;
+  task_id?: number;
+  team_id?: number;
+  user_id?: number;
+  object?: string;
   created_at?: string;
   updated_at?: string;
   [key: string]: any;
@@ -16,11 +20,16 @@ export class NotesHandler {
   async listNotes(args: any = {}): Promise<Note[]> {
     const params: Record<string, any> = {};
 
-    if (args.limit) params.limit = args.limit;
+    if (args.limit) params.per_page = args.limit;
     if (args.offset) params.offset = args.offset;
     if (args.contact_id) params.contact_id = args.contact_id;
     if (args.deal_id) params.deal_id = args.deal_id;
+    if (args.task_id) params.task_id = args.task_id;
+    if (args.user_id) params.user_id = args.user_id;
+    if (args.team_id) params.team_id = args.team_id;
     if (args.search) params.search = args.search;
+    if (args.sort_field) params.sort_field = args.sort_field;
+    if (args.sort_order) params.sort_order = args.sort_order;
 
     return await this.apiClient.get<Note[]>('/notes', params);
   }
@@ -33,8 +42,8 @@ export class NotesHandler {
   }
 
   async createNote(args: { note: Partial<Note> }): Promise<Note> {
-    if (!args.note || !args.note.content) {
-      throw new Error('Note content is required');
+    if (!args.note || !args.note.text) {
+      throw new Error('Note text is required');
     }
     return await this.apiClient.post<Note>('/notes', args.note);
   }
@@ -69,7 +78,12 @@ export const notesToolDefinitions = [
         offset: { type: 'number', description: 'Number of notes to skip' },
         contact_id: { type: 'number', description: 'Filter by contact ID' },
         deal_id: { type: 'number', description: 'Filter by deal ID' },
-        search: { type: 'string', description: 'Search term to filter notes' }
+        task_id: { type: 'number', description: 'Filter by task ID' },
+        user_id: { type: 'number', description: 'Filter by user ID' },
+        team_id: { type: 'number', description: 'Filter by team ID' },
+        search: { type: 'string', description: 'Search term to filter notes' },
+        sort_field: { type: 'string', description: 'Field to sort by (created_at, updated_at)' },
+        sort_order: { type: 'string', description: 'Sort order (asc, desc)' }
       }
     }
   },
@@ -93,11 +107,13 @@ export const notesToolDefinitions = [
         note: {
           type: 'object',
           properties: {
-            content: { type: 'string', description: 'Note content' },
+            text: { type: 'string', description: 'Note content' },
             contact_id: { type: 'number', description: 'Associated contact ID' },
-            deal_id: { type: 'number', description: 'Associated deal ID' }
+            deal_id: { type: 'number', description: 'Associated deal ID' },
+            user_id: { type: 'number', description: 'Assigned user ID' },
+            team_id: { type: 'number', description: 'Assigned team ID' }
           },
-          required: ['content']
+          required: ['text']
         }
       },
       required: ['note']
@@ -113,9 +129,11 @@ export const notesToolDefinitions = [
         note: {
           type: 'object',
           properties: {
-            content: { type: 'string', description: 'Note content' },
+            text: { type: 'string', description: 'Note content' },
             contact_id: { type: 'number', description: 'Associated contact ID' },
-            deal_id: { type: 'number', description: 'Associated deal ID' }
+            deal_id: { type: 'number', description: 'Associated deal ID' },
+            user_id: { type: 'number', description: 'Assigned user ID' },
+            team_id: { type: 'number', description: 'Assigned team ID' }
           }
         }
       },

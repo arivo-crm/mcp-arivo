@@ -1,15 +1,33 @@
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
 import { Config } from '../config';
+import { readFileSync } from 'fs';
+import { join } from 'path';
+
+// Helper function to get version from package.json
+function getVersion(): string {
+  try {
+    // Read version from package.json at runtime
+    const packageJson = JSON.parse(
+      readFileSync(join(process.cwd(), 'package.json'), 'utf-8')
+    );
+    return packageJson.version;
+  } catch {
+    // Fallback version if package.json cannot be read
+    return '1.1.0';
+  }
+}
 
 export class ArivoApiClient {
   private client: AxiosInstance;
 
   constructor(config: Config) {
+    const version = getVersion();
     this.client = axios.create({
       baseURL: config.apiUrl,
       headers: {
         'Authorization': `Token token=${config.apiKey}`,
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'User-Agent': `mcp-arivo/${version} (MCP Server; +https://github.com/anthropics/mcp-arivo)`
       }
     });
   }
@@ -53,18 +71,74 @@ export class ArivoApiClient {
   private handleError(error: any): never {
     if (error.response) {
       const status = error.response.status;
-      const message = error.response.data?.message || error.response.statusText;
+      const responseData = error.response.data;
+
+      // Extract meaningful error message
+      let message = error.response.statusText || 'Unknown error';
+
+      if (responseData) {
+        if (typeof responseData === 'string') {
+          message = responseData;
+        } else if (responseData.message) {
+          message = responseData.message;
+        } else if (responseData.error) {
+          message = responseData.error;
+        } else if (responseData.errors) {
+          // Handle validation errors properly
+          if (Array.isArray(responseData.errors)) {
+            message = responseData.errors.join(', ');
+          } else if (typeof responseData.errors === 'object' && responseData.errors !== null) {
+            // Convert object errors to readable format
+            const errorMessages = Object.entries(responseData.errors)
+              .map(([field, fieldErrors]) => {
+                if (Array.isArray(fieldErrors)) {
+                  return `${field}: ${fieldErrors.join(', ')}`;
+                } else {
+                  return `${field}: ${String(fieldErrors)}`;
+                }
+              })
+              .join('; ');
+            message = errorMessages || 'Validation errors occurred';
+          } else {
+            message = String(responseData.errors);
+          }
+        } else {
+          // Fallback: stringify the entire response data
+          try {
+            message = JSON.stringify(responseData, null, 2);
+          } catch {
+            message = String(responseData);
+          }
+        }
+      }
+
+      // Ensure message is always a string and never [object Object]
+      if (typeof message !== 'string') {
+        try {
+          message = JSON.stringify(message);
+        } catch {
+          message = 'Error occurred but could not parse error details';
+        }
+      }
 
       switch (status) {
         case 401:
           throw new Error(`Unauthorized: invalid API key`);
         case 404:
-          throw new Error(`Not found`);
+          throw new Error(`Not found: ${message}`);
+        case 422:
+          throw new Error(`Validation error: ${message}`);
+        case 400:
+          throw new Error(`Bad request: ${message}`);
+        case 403:
+          throw new Error(`Forbidden: ${message}`);
+        case 500:
+          throw new Error(`Server error: ${message}`);
         default:
-          throw new Error(`Arivo API error: ${message}`);
+          throw new Error(`Arivo API error (${status}): ${message}`);
       }
     } else if (error.request) {
-      throw new Error(`Arivo API error: Network error`);
+      throw new Error(`Arivo API error: Network error - no response received`);
     } else {
       throw new Error(`Arivo API error: ${error.message}`);
     }
