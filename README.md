@@ -1,5 +1,7 @@
 # mcp-arivo
 
+[Português](README.pt-BR.md) | English
+
 A Model Context Protocol (MCP) server for Arivo CRM integration, enabling AI assistants to interact with your Arivo CRM data through a standardized interface.
 
 ## Example Usage
