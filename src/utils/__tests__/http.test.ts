@@ -28,7 +28,8 @@ describe('ArivoApiClient', () => {
         baseURL: mockConfig.apiUrl,
         headers: {
           'Authorization': `Token token=${mockConfig.apiKey}`,
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'User-Agent': 'mcp-arivo/1.1.0 (MCP Server; +https://github.com/anthropics/mcp-arivo)'
         }
       });
     });

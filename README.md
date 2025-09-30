@@ -173,11 +173,12 @@ Add the following to your Claude Desktop configuration file:
 Once connected, you can ask Claude to interact with your Arivo CRM:
 
 ```
-"List all my contacts"
+"List me 100 contacts that were recently updated"
 "Create a new contact named John Doe with email john@example.com and phone (555) 123-4567"
-"Show me all deals in the pipeline"
-"Create a task to follow up with contact ID 123"
-"Add a note to deal ID 456 saying 'Customer requested custom pricing'"
+"Add tags 'vip' and 'gold' to contact John Doe"
+"How many deals are open in the last step of pipeline 'Funil de vendas'?"
+"Create a task to follow up with company Acme next week"
+"Add a note to deal ID 71 saying 'Customer requested custom pricing'"
 "List all products in the 'electronics' category"
 "Create a custom record for Pizza with pepperoni topping"
 "Show me all users in the sales team"

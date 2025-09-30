@@ -1,15 +1,33 @@
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
 import { Config } from '../config';
+import { readFileSync } from 'fs';
+import { join } from 'path';
+
+// Helper function to get version from package.json
+function getVersion(): string {
+  try {
+    // Read version from package.json at runtime
+    const packageJson = JSON.parse(
+      readFileSync(join(process.cwd(), 'package.json'), 'utf-8')
+    );
+    return packageJson.version;
+  } catch {
+    // Fallback version if package.json cannot be read
+    return '1.1.0';
+  }
+}
 
 export class ArivoApiClient {
   private client: AxiosInstance;
 
   constructor(config: Config) {
+    const version = getVersion();
     this.client = axios.create({
       baseURL: config.apiUrl,
       headers: {
         'Authorization': `Token token=${config.apiKey}`,
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'User-Agent': `mcp-arivo/${version} (MCP Server; +https://github.com/anthropics/mcp-arivo)`
       }
     });
   }
