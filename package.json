@@ -14,9 +14,27 @@
     "test": "jest",
     "prepublishOnly": "npm run build"
   },
-  "keywords": ["mcp", "arivo", "crm", "server"],
-  "author": "Your Name",
+  "keywords": ["mcp", "arivo", "crm", "ai"],
+  "author": {
+    "name": "Elcio Nakashima",
+    "email": "contato@arivo.com.br"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/arivo-crm/mcp-arivo.git"
+  },
   "license": "MIT",
+  "homepage": "https://arivo.com.br",
+  "bugs": {
+    "url": "https://github.com/arivo-crm/mcp-arivo/issues"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "README.pt-BR.md",
+    "LICENSE",
+    "CHANGELOG.md"
+  ],
   "dependencies": {
     "@modelcontextprotocol/sdk": "^0.5.0",
     "axios": "^1.6.0",
