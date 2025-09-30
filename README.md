@@ -2,32 +2,203 @@
 
 A Model Context Protocol (MCP) server for Arivo CRM integration, enabling AI assistants to interact with your Arivo CRM data through a standardized interface.
 
-## Features
+## Example Usage
 
-- **Comprehensive CRUD Operations**: Full support for contacts, deals, tasks, notes, and custom records
-- **Product Management**: Manage products and product categories
-- **Custom Records**: Create and manage custom record definitions and instances
-- **Reference Data**: Access users, teams, pipelines, task types, and custom fields
-- **Attachment Management**: List and manage attachment files
-- **Secure**: API key stored locally, never transmitted or embedded
-- **Easy Setup**: Simple configuration via environment variables or config file
-- **MCP Compatible**: Works with Claude Desktop, ChatGPT, and other MCP-compatible clients
-- **TypeScript**: Fully typed for better development experience
-- **Detailed Error Messages**: Clear validation and error feedback from the API
+Once connected, you can your AI assistant/agent to interact with your Arivo CRM:
+
+```
+"List me 100 contacts that were recently updated"
+"Create a new contact named John Doe with email john@example.com and phone (555) 123-4567"
+"Add tags 'vip' and 'gold' to contact John Doe"
+"How many deals are open in the last step of pipeline 'Funil de vendas'?"
+"Create a task to follow up with company Acme next week"
+"Add a note to deal ID 71 saying 'Customer requested custom pricing'"
+"List all products in the 'electronics' category"
+"Create a custom record for Pizza with pepperoni topping"
+"Show me all users in the sales team"
+"What are the available task types?"
+```
+
+## Requirements
+
+- Node.js 18.0.0 or higher
+- Arivo CRM API key (obtain from your Arivo CRM account settings)
+- Compatible with MCP clients:
+  - Claude Desktop
+  - Claude Code
+  - Cursor
+  - VSCode with MCP extension
+  - Windsurf
+  - Other MCP-compatible clients
 
 ## Installation
 
-### Global Installation (Recommended)
+<details>
+<summary><b>Claude Desktop</b></summary>
 
-```bash
-npm install -g mcp-arivo
+1. Open your Claude Desktop configuration file:
+   - **Windows**: `%APPDATA%\Claude\claude_desktop_config.json`
+   - **macOS/Linux**: `~/Library/Application Support/Claude/claude_desktop_config.json`
+
+2. Add the MCP server configuration:
+```json
+{
+  "mcpServers": {
+    "arivo-crm": {
+      "command": "npx",
+      "args": ["-y", "mcp-arivo"],
+      "env": {
+        "ARIVO_API_KEY": "your-arivo-api-key"
+      }
+    }
+  }
+}
 ```
 
-### Local Installation
+3. Restart Claude Desktop
+
+</details>
+
+<details>
+<summary><b>Claude Code</b></summary>
+
+1. Open your Claude Code MCP settings file:
+   - **Windows**: `%APPDATA%\Claude\claude_code_mcp_settings.json`
+   - **macOS/Linux**: `~/Library/Application Support/Claude/claude_code_mcp_settings.json`
+
+2. Add the MCP server configuration:
+```json
+{
+  "mcpServers": {
+    "arivo-crm": {
+      "command": "npx",
+      "args": ["-y", "mcp-arivo"],
+      "env": {
+        "ARIVO_API_KEY": "your-arivo-api-key"
+      }
+    }
+  }
+}
+```
+
+3. Restart Claude Code or reload the MCP settings
+
+</details>
+
+<details>
+<summary><b>Cursor</b></summary>
+
+1. Open Cursor Settings (Ctrl+Shift+J or Cmd+Shift+J)
+
+2. Navigate to "Features" → "Model Context Protocol"
+
+3. Click "Add MCP Server" and configure:
+   - **Name**: `arivo-crm`
+   - **Command**: `npx`
+   - **Arguments**: `-y mcp-arivo`
+   - **Environment Variables**:
+     ```
+     ARIVO_API_KEY=your-arivo-api-key
+     ```
+
+4. Restart Cursor
+
+</details>
+
+<details>
+<summary><b>VS Code</b></summary>
+
+1. Install the [MCP extension for VS Code](https://marketplace.visualstudio.com/items?itemName=ModelContextProtocol.mcp)
+
+2. Open VS Code settings (Ctrl+, or Cmd+,) and search for "MCP"
+
+3. Edit the MCP configuration file or add via UI:
+```json
+{
+  "mcp.servers": {
+    "arivo-crm": {
+      "command": "npx",
+      "args": ["-y", "mcp-arivo"],
+      "env": {
+        "ARIVO_API_KEY": "your-arivo-api-key"
+      }
+    }
+  }
+}
+```
+
+4. Reload VS Code window
+
+</details>
+
+<details>
+<summary><b>Windsurf</b></summary>
+
+1. Open Windsurf settings and navigate to MCP configuration
+
+2. Add the server configuration:
+```json
+{
+  "mcpServers": {
+    "arivo-crm": {
+      "command": "npx",
+      "args": ["-y", "mcp-arivo"],
+      "env": {
+        "ARIVO_API_KEY": "your-arivo-api-key"
+      }
+    }
+  }
+}
+```
+
+3. Restart Windsurf
+
+</details>
+
+<details>
+<summary><b>Gemini CLI</b></summary>
+
+Configure MCP server for Gemini CLI:
 
 ```bash
-npm install mcp-arivo
+# macOS/Linux
+export MCP_SERVERS='{"arivo-crm":{"command":"npx","args":["-y","mcp-arivo"],"env":{"ARIVO_API_KEY":"your-arivo-api-key"}}}'
+
+# Windows (PowerShell)
+$env:MCP_SERVERS='{"arivo-crm":{"command":"npx","args":["-y","mcp-arivo"],"env":{"ARIVO_API_KEY":"your-arivo-api-key"}}}'
 ```
+
+Then run Gemini CLI with MCP support enabled.
+
+**Windows Note**: For persistent configuration, add the environment variable to your system environment variables through System Properties → Advanced → Environment Variables
+
+</details>
+
+<details>
+<summary><b>GitHub Copilot Coding Agent</b></summary>
+
+1. Create or edit the Copilot MCP configuration file:
+   - **Windows**: `%USERPROFILE%\.github-copilot\mcp-servers.json`
+   - **macOS/Linux**: `~/.github-copilot/mcp-servers.json`
+
+2. Add the MCP server configuration:
+```json
+{
+  "mcpServers": {
+    "arivo-crm": {
+      "command": "npx",
+      "args": ["-y", "mcp-arivo"],
+      "env": {
+        "ARIVO_API_KEY": "your-arivo-api-key"
+      }
+    }
+  }
+}
+```
+
+3. Restart your IDE or coding environment
+
+</details>
 
 ## Configuration
 
@@ -55,41 +226,6 @@ Create a `config.json` file in your project directory:
 mcp-arivo --api-key your-api-key --api-url https://arivo.com.br/api/v2
 ```
 
-## Usage
-
-### Running the Server
-
-```bash
-# If installed globally
-mcp-arivo
-
-# If installed locally
-npx mcp-arivo
-
-# With command line options
-mcp-arivo --api-key your-api-key
-```
-
-### Connecting to Claude Desktop
-
-Add the following to your Claude Desktop configuration file:
-
-**Windows**: `%APPDATA%\\Claude\\claude_desktop_config.json`
-**macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`
-**Linux**: `~/.config/Claude/claude_desktop_config.json`
-
-```json
-{
-  "mcpServers": {
-    "arivo-crm": {
-      "command": "mcp-arivo",
-      "env": {
-        "ARIVO_API_KEY": "your-arivo-api-key"
-      }
-    }
-  }
-}
-```
 
 ## Available Tools
 
@@ -168,23 +304,6 @@ Add the following to your Claude Desktop configuration file:
 - `get_attachment_file` - Get a specific attachment file by ID
 - `delete_attachment_file` - Delete an attachment file
 
-## Example Usage with Claude
-
-Once connected, you can ask Claude to interact with your Arivo CRM:
-
-```
-"List me 100 contacts that were recently updated"
-"Create a new contact named John Doe with email john@example.com and phone (555) 123-4567"
-"Add tags 'vip' and 'gold' to contact John Doe"
-"How many deals are open in the last step of pipeline 'Funil de vendas'?"
-"Create a task to follow up with company Acme next week"
-"Add a note to deal ID 71 saying 'Customer requested custom pricing'"
-"List all products in the 'electronics' category"
-"Create a custom record for Pizza with pepperoni topping"
-"Show me all users in the sales team"
-"What are the available task types?"
-```
-
 ## API Coverage
 
 This MCP server provides comprehensive coverage of the Arivo CRM REST API:
@@ -205,15 +324,6 @@ This MCP server provides comprehensive coverage of the Arivo CRM REST API:
 | Task Types | ✅ | - | - | - | - |
 | Custom Fields | ✅ | - | - | - | - |
 | Attachment Files | ✅ | ✅ | - | - | ✅ |
-
-### Complex Data Structures
-
-The MCP server fully supports complex nested data structures:
-
-- **Contacts**: Multiple phones, emails, and addresses per contact
-- **Deals**: Quote items with products, prices, quantities, and discounts
-- **Tasks**: Recurring tasks with custom schedules (daily, weekly, monthly)
-- **Custom Records**: Flexible custom fields with various data types (string, number, date, list)
 
 ## Development
 
@@ -237,18 +347,6 @@ npm run dev
 ```bash
 npm test
 ```
-
-## Error Handling
-
-The server provides detailed error messages for common scenarios:
-
-- **401 Unauthorized**: Invalid or missing API key
-- **404 Not Found**: Resource not found
-- **422 Validation Error**: Displays specific field validation errors from the API
-- **Network Errors**: Connection issues with Arivo API
-- **400 Bad Request**: Invalid request parameters or data
-
-All validation errors from the Arivo API are properly parsed and displayed with specific field-level error messages, making it easy to identify and fix issues.
 
 ## Security
 
